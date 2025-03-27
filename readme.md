@@ -14,7 +14,7 @@ This Jax/Pallas/Triton project extends [fused attention](https://arxiv.org/abs/2
 - Fused backwards-over-backwards kernels for softmax (and sigmoid) attention operators
 - A rudimentary [Pallas](https://docs.jax.dev/en/latest/pallas/index.html) autotuner
 
-Sigmoid attention double backwards is very fast; softmax attention double backwards is not (yet) very fast. This is due to both (a) the structure of the computation and (b) the nature of the fused attention trick. See the [The Softmax Attention Calamity](#the-softmax-attention-calamity) section below for a discussion on the details of this challenge/open problem.
+Sigmoid attention double backwards is very fast; softmax attention double backwards is not (yet) very fast. This is due to both (a) the structure of the computation and (b) the nature of the fused attention trick. For details on this open problem see the [The Softmax Attention Calamity](#the-softmax-attention-calamity) section below.
 
 
 
