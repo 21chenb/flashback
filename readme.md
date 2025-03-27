@@ -1,11 +1,5 @@
 ##  Flashback: Fused backwards-over-backwards for attention ⚡🔙🔙
 <p align = 'center'>
-[<a href="#quickstart">quickstart/install</a>]
-[<a href="#overview">overview</a>]
-[<a href="#usage">usage</a>]
-[<a href="#sharp-pointsbest-practicesprecision-gotchas">pointy bits</a>]
-[<a href="#the-softmax-attention-calamity">the softmax attention calamity</a>]
-<br>
 by <a href="https://loganengstrom.com">Logan Engstrom</a> and <a href="https://feldmann.nyc">Axel Feldmann</a>
 </p>
 
@@ -15,6 +9,14 @@ This Jax/Pallas/Triton project extends [fused attention](https://arxiv.org/abs/2
 - A rudimentary [Pallas](https://docs.jax.dev/en/latest/pallas/index.html) autotuner
 
 Sigmoid attention double backwards is very fast; softmax attention double backwards is not (yet) very fast. This is due to both (a) the structure of the computation and (b) the nature of the fused attention trick. For details on this open problem see the [The Softmax Attention Calamity](#the-softmax-attention-calamity) section below.
+
+<p align = 'center'>
+[<a href="#quickstart">quickstart/install</a>]
+[<a href="#overview">overview</a>]
+[<a href="#usage">usage</a>]
+[<a href="#sharp-pointsbest-practicesprecision-gotchas">pointy bits</a>]
+[<a href="#the-softmax-attention-calamity">the softmax attention calamity</a>]
+</p>
 
 ## Quickstart
 
