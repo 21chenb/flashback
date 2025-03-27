@@ -1,8 +1,4 @@
 ##  Flashback: Fused backwards-over-backwards for attention ⚡🔙🔙
-<p align = 'center'>
-by <a href="https://loganengstrom.com">Logan Engstrom</a> and <a href="https://feldmann.nyc">Axel Feldmann</a>
-</p>
-
 This Jax/Pallas/Triton project extends [fused attention](https://arxiv.org/abs/2205.14135) to support the backwards pass over the backwards pass (for use in e.g., <a href="https://arxiv.org/abs/2503.13751">differentiating over model training</a>). The main contributions are two-fold:
 
 - Fused backwards-over-backwards kernels for softmax (and sigmoid) attention operators
@@ -16,6 +12,9 @@ Sigmoid attention double backwards is very fast; softmax attention double backwa
 [<a href="#usage">usage</a>]
 [<a href="#sharp-pointsbest-practicesprecision-gotchas">pointy bits</a>]
 [<a href="#the-softmax-attention-calamity">the softmax attention calamity</a>]
+</p>
+<p align = 'center'>
+by <a href="https://loganengstrom.com">Logan Engstrom</a> and <a href="https://feldmann.nyc">Axel Feldmann</a>
 </p>
 
 ## Quickstart
