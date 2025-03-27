@@ -1,5 +1,5 @@
 ##  Flashback: Fused backwards-over-backwards for attention ⚡🔙🔙
-This Jax/Pallas/Triton project extends [fused attention](https://arxiv.org/abs/2205.14135) to support the backwards pass over the backwards pass (for use in e.g., <a href="https://arxiv.org/abs/2503.13751">differentiating over model training</a>). The main contributions are two-fold:
+This Jax/Pallas/Triton project extends [fused attention](https://arxiv.org/abs/2205.14135) to support the backwards pass over the backwards pass (for e.g., <a href="https://arxiv.org/abs/2503.13751">differentiating over model training</a>). The main contributions are two-fold:
 
 - Fused backwards-over-backwards kernels for softmax (and sigmoid) attention operators
 - A rudimentary [Pallas](https://docs.jax.dev/en/latest/pallas/index.html) autotuner
