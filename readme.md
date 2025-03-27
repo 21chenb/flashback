@@ -97,9 +97,9 @@ hyperparmarameters for your kernel execution and automatically grid search
 over them to identify the best possible configuration. In Jax land, Pallas has
 [no such tool](https://github.com/jax-ml/jax/issues/24340#issuecomment-2420227141).
 
-This project includes a rudimentary autotuner in `flashback/autotune.py`. It spawns a process on the first execution of a kernel in the compute graph to search for the best config (out of the specified grid of possible configs). It caches
-these configurations on a per machine basis in the `/tmp` folder. The autotuner
-used to break all the time, but breaks less now. If you have problems please report an issue.
+This project includes a rudimentary autotuner in [`flashback/autotune.py`](https://github.com/lengstrom/flashback/blob/main/flashback/autotune.py). It spawns a process on the first execution of a kernel in the compute graph to search for the best config (out of the specified grid of possible configs). It caches
+these configs in the `/tmp` folder. Our autotuner
+used to break all the time, but breaks less now. If you have problems please report an issue and we will try to fix it.
 
 ### Controlling the autotuner
 There are two environmental variables you can control the autotuner with:
