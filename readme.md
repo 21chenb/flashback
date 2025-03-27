@@ -77,7 +77,7 @@ It is easy to cut yourself with this project. Some things to watch out for:
 - **The autotuner failing**: The autotuner has a tqdm bar that runs, if it stops for an extended period of time look at the autotuner section below for possible remedies; please file an issue if you run into this.
 
 ## The Softmax Attention Calamity
-*Note: This section is written for readers that understand the attention backwards pass implemented in [flash attention](https://arxiv.org/abs/2205.14135).*
+*Note: This section is written for readers who understand the attention backwards pass of [flash attention](https://arxiv.org/abs/2205.14135).*
 
 Our softmax double backwards is very slow in practical settings, usually matching (or losing to) the naive implementation in terms of throughput. This is due to the both (a) <ins>the structure of the computation</ins> and (b) <ins>the nature of the fused attention trick</ins>.
 
