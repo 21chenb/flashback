@@ -90,9 +90,6 @@ and many of the compiler tricks used to automatically optimize smaller kernels (
 <p><b>Sigmoid attention.</b> One light in the darkness here is sigmoid attention; sigmoid attention is elementwise (rather than "rowwise" over the input sequence as softmax attention is) so the double gradients are much faster/more straightforward. We can get away with only 4 reinstantiations total (rather than 5 in the double backwards case) and the operations are much simpler. This really shows up in the section below where we profile the different attentions.
 </p>
 
-## Wall Times
-
-
 ## Autotuner
 In Pytorch land, Triton has an autotuner that lets you input a menu of possible
 hyperparmarameters for your kernel execution and automatically grid search
