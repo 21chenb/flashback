@@ -1,4 +1,14 @@
 ##  Flashback: Fused backwards-over-backwards for attention ⚡🔙🔙
+<p align = 'center'>
+[<a href="#quickstart">quickstart/install</a>]
+[<a href="#overview">overview</a>]
+[<a href="#usage">usage</a>]
+[<a href="#sharp-pointsbest-practicesprecision-gotchas">pointy bits</a>]
+[<a href="#the-softmax-attention-calamity">the softmax attention calamity</a>]
+<br>
+by <a href="https://loganengstrom.com">Logan Engstrom</a> and <a href="https://feldmann.nyc">Axel Feldmann</a>
+</p>
+
 This Jax/Pallas/Triton project extends [fused attention](https://arxiv.org/abs/2205.14135) to support the backwards pass over the backwards pass. The main contributions are two-fold:
 
 - Fused backwards-over-backwards kernels for softmax (and sigmoid) attention operators
@@ -7,15 +17,7 @@ This Jax/Pallas/Triton project extends [fused attention](https://arxiv.org/abs/2
 Sigmoid attention double backwards is very fast; softmax attention double backwards is not (yet) very fast. This is due to both (a) the structure of the computation and (b) the nature of the fused attention trick. See the [The Softmax Attention Calamity](#the-softmax-attention-calamity) section below for a discussion on the details of this challenge/open problem.
 
 
-<p align = 'center'>
-<!-- <br /> -->
-[<a href="#quickstart">quickstart/install</a>]
-[<a href="#overview">overview</a>]
-[<a href="#usage">usage</a>]
-[<a href="#sharp-pointsbest-practicesprecision-gotchas">pointy bits</a>]
-[<a href="#the-softmax-attention-calamity">the softmax attention calamity</a>]
-<br>
-</p>
+
 
 ## Quickstart
 
