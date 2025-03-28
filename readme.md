@@ -112,7 +112,7 @@ Below, we measure walltime while varying sequence length (we fix batch size / di
 
 ## Autotuner
 In Pytorch land, Triton has an autotuner that lets you input a menu of possible
-hyperparmarameters for your kernel execution and automatically grid search
+hyperparameters for your kernel execution and automatically grid search
 over them to identify the best possible configuration. In Jax land, Pallas has
 [no such tool](https://github.com/jax-ml/jax/issues/24340#issuecomment-2420227141).
 
