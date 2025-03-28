@@ -79,7 +79,15 @@ It is easy to cut yourself with this project. Some things to watch out for:
 ## The Softmax Attention Calamity
 *Note: For more context on this section, understand the attention backwards pass of [flash attention](https://arxiv.org/abs/2205.14135).*
 
-Our softmax double backwards often does not greatly improve throughput in practical settings, and can even match (or lose to) the naive implementation. This is due to the both (a) <ins>the structure of the computation</ins> and (b) <ins>the nature of the fused attention trick</ins>. 
+Our softmax double backwards often does not greatly improve throughput in practical settings, and can even match (or lose to) the naive implementation. This is due to the both (a) <ins>the nature of the fused attention trick</ins> and (b) 
+<ins>the structure of the computation</ins>.
+
+<p><b>Pushing the limits of the fused attention trick.</b> In the second category, the fused attention trick <i>necessarily</i> requires reinstantiating the probability matrix with every pass. Thinking about the entire chain of compute when calculating the gradient with autograd: a pipeline that only completes the backward pass requires only two reinstantiations (once in the forward pass, once backward). In contrast, any pipeline that includes the double backward pass requires at least 2 additional reinstantiations <i>on top of</i> those in the backwards pass (to see this, think about how we backprop on this compute graph: our forward pass here is "forward to backward", so we have to do one backwards over the backwards, then another backwards over the forward before finishing). In contrast,
+backprop over naive attention simply saves all the intermediate products so there is no additional recomputation cost.
+
+The complexity of the double backwards kernels also has additional (negative) performance implications. Because of the sheer number of operands and matrix multiplications involved, we're pushing the Pallas/Triton compiler to its limits. Operating on so many tensors in a single kernel quickly exhausts available SRAM,
+and many of the compiler tricks used to automatically optimize smaller kernels (e.g., fused attention forward pass) don't work in our setting.
+</p>
 
 <p><b>The structure of the softmax backwards-over-backwards.</b> In the first category, in our implementation one has to reinstantiate the probability matrix <i>twice</i> in the
 backwards pass to backpropagate over the backwards pass properly. The problem is that in the compute DAG, there are "rowwise" quantities that we cannot compute ahead of time, so we need to do reinstantiate most of the intermediate attention products to compute <a href="https://github.com/lengstrom/flashback/blob/main/flashback/attentions/flash_softmax_bob_kernel.py#L126">them</a> before the <a href="https://github.com/lengstrom/flashback/blob/main/flashback/attentions/flash_softmax_bob_kernel.py#L199">final output</a>. To see where these quantities appear, we refer to the compute graph of the backwards pass (and, on the right, a subgraph of the backwards pass for the backwards pass):
@@ -88,14 +96,6 @@ backwards pass to backpropagate over the backwards pass properly. The problem is
 Computing the softmax-induced probability matrix $\text{P}$ (or differentiating across this operation) requires calculating rowwise values. <a href"https://github.com/lengstrom/flashback/blob/main/derivations.py#L64">Explicitly writing out</a> the backwards-over-backwards pass, we can see that this includes the contribution to $\dot{\text{dP}}$ propagated from $\dot{\text{dK}}$ (featured) among others.
   
 In contrast, both the forward and backward passes of fused attention we can get away with only reinstantiating this probability matrix only <i>once</i> (in the backwards pass case, by cleverly memoizing state like maxes etc in the forward pass). We tried to avoid doing two additional recomputations (by saving additional state/reordering the compute graph), but could not find a way out. Please prove us wrong! As a starting point, you might find this helpful: we write out the entire backwards-over-backwards pass in "math" [here](https://github.com/lengstrom/flashback/blob/main/derivations.py) using Jax, and include tests if you want to refactor the compute graph.
-
-
-<p><b>Pushing the limits of the fused attention trick.</b> In the second category, the fused attention trick <i>necessarily</i> requires reinstantiating the probability matrix with every pass. Thinking about the entire chain of compute when calculating the gradient with autograd: a pipeline that only completes the backward pass requires only two reinstantiations (once in the forward pass, once backward). In contrast, any pipeline that includes the double backward pass requires at least 2 additional reinstantiations <i>on top of</i> those in the backwards pass (to see this, think about how we backprop on this compute graph: our forward pass here is "forward to backward", so we have to do one backwards over the backwards, then another backwards over the forward before finishing). In contrast,
-backprop over naive attention simply saves all the intermediate products so there is no additional recomputation cost.
-
-The complexity of the double backwards kernels also has additional (negative) performance implications. Because of the sheer number of operands and matrix multiplications involved, we're pushing the Pallas/Triton compiler to its limits. Operating on so many tensors in a single kernel quickly exhausts available SRAM,
-and many of the compiler tricks used to automatically optimize smaller kernels (e.g., fused attention forward pass) don't work in our setting.
-</p>
 
 <p><b>Sigmoid attention.</b> One light in the darkness here is sigmoid attention; sigmoid attention is elementwise (rather than "rowwise" over the input sequence as softmax attention is) so the double gradients are much faster/more straightforward. We can get away with only 4 reinstantiations total (rather than 5 in the double backwards case) and the operations are much simpler. This really shows up in the section below where we profile the different attentions.
 </p>
