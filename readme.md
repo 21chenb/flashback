@@ -24,7 +24,7 @@ Sigmoid attention double backwards is very fast; softmax attention double backwa
 
 </p>
 
-<b><i>Why</i> implement a fused attention backwards-over-backwards?</b> First, its a cool problem! But maybe more importantly, it enables calculating the gradient of any function that has a backwards pass over attention in it, such as model training steps. The gradient over model training steps arises in [metalearning](https://arxiv.org/abs/1703.03400), [optimizing over model training](https://arxiv.org/abs/2503.13751)/[hyperparameter search](https://arxiv.org/abs/1502.03492), [architecture search](https://arxiv.org/abs/1806.09055), [data poisoning](https://arxiv.org/abs/2204.09092) and more. By implementing a high throughput/memory efficient fused backwards-over-backwards for we hope to accelerate research in these areas for attention-based models (like transformers/LMs/VLMs).
+<b><i>Why</i> implement a fused attention backwards-over-backwards?</b> First, its a cool problem! But maybe more importantly, it enables calculating the gradient of any function that includes an attention backwards pass, such as model training steps. Indeed, functions like this arise in [metalearning](https://arxiv.org/abs/1703.03400), [optimizing over model training](https://arxiv.org/abs/2503.13751)/[hyperparameter search](https://arxiv.org/abs/1502.03492), [architecture search](https://arxiv.org/abs/1806.09055), [data poisoning](https://arxiv.org/abs/2204.09092) and more. By implementing a high throughput/memory efficient fused backwards-over-backwards for we hope to accelerate research in these areas for attention-based models (like transformers/LMs/VLMs).
 
 ## Quickstart
 
