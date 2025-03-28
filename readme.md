@@ -100,6 +100,15 @@ In contrast, both the forward and backward passes of fused attention we can get 
 <p><b>Sigmoid attention.</b> One light in the darkness here is sigmoid attention; sigmoid attention is elementwise (rather than "rowwise" over the input sequence as softmax attention is) so the double gradients are much faster/more straightforward. We can get away with only 4 reinstantiations total (rather than 5 in the double backwards case) and the operations are much simpler. This really shows up in the section below where we profile the different attentions.
 </p>
 
+## Profiling
+Below, we measure walltime while varying sequence length (we fix batch size / dimension / number of heads; see the [experiment code](https://github.com/lengstrom/flashback/blob/main/tests/walltime.py#L92) for details. We measure for both sigmoid attention and softmax attention. In this setup our results are strong. Sigmoid attention dominates naive sigmoid attention in walltime, and softmax attention is at least as performant as its naive counterpart. At the same time, both methods (should) also use much less memory (we do not plot memory usage as it is tricky in Jax, but we expect fused attention to use ~linear memory in sequence length, while naive attention uses ~quadratic memory in sequence length). No guarantee these kinds of results will hold everywhere: YMMV depending on your setting.
+
+#### Sigmoid Attention
+<img src="plots/exp2_sigmoid.svg" width="100%"/>
+
+#### Softmax Attention
+<img src="plots/exp2_softmax.svg" width="100%"/>
+
 ## Autotuner
 In Pytorch land, Triton has an autotuner that lets you input a menu of possible
 hyperparmarameters for your kernel execution and automatically grid search
