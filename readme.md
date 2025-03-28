@@ -9,13 +9,13 @@
   by <a href="https://loganengstrom.com">Logan Engstrom</a> and <a href="https://feldmann.nyc">Axel Feldmann</a>
 
 </p>
+
 This Jax/Pallas/Triton project extends [fused attention](https://arxiv.org/abs/2205.14135) to support the backwards pass over the backwards pass (for e.g., <a href="https://arxiv.org/abs/2503.13751">differentiating over model training</a>). The main contributions are two-fold:
 
 - Fused backwards-over-backwards kernels for softmax (and sigmoid) attention operators
 - A rudimentary [Pallas](https://docs.jax.dev/en/latest/pallas/index.html) autotuner
 
-Sigmoid attention double backwards is very fast; softmax attention double backwards is not (yet) very fast. This is due to both (a) the structure of the computation and (b) the nature of the fused attention trick. For details on this open problem see the [The Softmax Attention Calamity](#the-softmax-attention-calamity) section below.
-
+Sigmoid attention double backwards is very fast; softmax attention double backwards is not (yet) very fast. This is due to both (a) the structure of the computation and (b) the nature of the fused attention trick. We include both [derivations](https://github.com/lengstrom/flashback/blob/main/derivations.py)  of the backwards-over-backward pass and primers on why this (open) problem is hard - see the [The Softmax Attention Calamity](#the-softmax-attention-calamity) section below for details.
 
 
 
@@ -77,10 +77,12 @@ It is easy to cut yourself with this project. Some things to watch out for:
 - **The autotuner failing**: The autotuner has a tqdm bar that runs, if it stops for an extended period of time look at the autotuner section below for possible remedies; please file an issue if you run into this.
 
 ## The Softmax Attention Calamity
-Our softmax double backwards is very slow in practical settings, usually matching (or losing to) the naive implementation in terms of throughput. This is due to the both (a) <ins>the structure of the computation</ins> and (b) <ins>the nature of the fused attention trick</ins>.
+*Note: This section is written for readers who understand the attention backwards pass of [flash attention](https://arxiv.org/abs/2205.14135).*
+
+Our softmax double backwards often does not greatly improve throughput in practical settings, and can even match (or lose to) the naive implementation. This is due to the both (a) <ins>the structure of the computation</ins> and (b) <ins>the nature of the fused attention trick</ins>. 
 
 <p><b>The structure of the softmax backwards-over-backwards.</b> In the first category, in our implementation one has to reinstantiate the probability matrix <i>twice</i> in the
-backwards pass to backpropagate over the backwards pass properly. The problem is that in the compute DAG, there are "rowwise" quantities that we cannot compute ahead of time, so we need to do reinstantiate most of the intermediate attention products to compute <a href="https://github.com/lengstrom/flashback/blob/main/flashback/attentions/flash_softmax_bob_kernel.py#L126">them</a> before the <a href="https://github.com/lengstrom/flashback/blob/main/flashback/attentions/flash_softmax_bob_kernel.py#L199">final output</a>. In contrast, both the forward and backward passes of fused attention we can get away with only reinstantiating this probability matrix only <i>once</i> (in the backwards pass case, by cleverly memoizing state like maxes etc in the forward pass). We tried hard to avoid doing two additional recomputations (by saving additional state/reordering the compute graph), but could not find a way out. Please prove us wrong!
+backwards pass to backpropagate over the backwards pass properly. The problem is that in the compute DAG, there are "rowwise" quantities that we cannot compute ahead of time, so we need to do reinstantiate most of the intermediate attention products to compute <a href="https://github.com/lengstrom/flashback/blob/main/flashback/attentions/flash_softmax_bob_kernel.py#L126">them</a> before the <a href="https://github.com/lengstrom/flashback/blob/main/flashback/attentions/flash_softmax_bob_kernel.py#L199">final output</a>. In contrast, both the forward and backward passes of fused attention we can get away with only reinstantiating this probability matrix only <i>once</i> (in the backwards pass case, by cleverly memoizing state like maxes etc in the forward pass). We tried hard to avoid doing two additional recomputations (by saving additional state/reordering the compute graph), but could not find a way out. Please prove us wrong! As a starting point, you might find this helpful: we write out the entire backwards-over-backwards pass in "math" [here](https://github.com/lengstrom/flashback/blob/main/derivations.py) using Jax, and include tests if you want to refactor the compute graph.
 
 <p><b>Pushing the limits of the fused attention trick.</b> In the second category, the fused attention trick <i>necessarily</i> requires reinstantiating the probability matrix with every pass. Thinking about the entire chain of compute when calculating the gradient with autograd: a pipeline that only completes the backward pass requires only two reinstantiations (once in the forward pass, once backward). In contrast, any pipeline that includes the double backward pass requires at least 2 additional reinstantiations <i>on top of</i> those in the backwards pass (to see this, think about how we backprop on this compute graph: our forward pass here is "forward to backward", so we have to do one backwards over the backwards, then another backwards over the forward before finishing). In contrast,
 backprop over naive attention simply saves all the intermediate products so there is no additional recomputation cost.

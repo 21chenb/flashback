@@ -1,3 +1,14 @@
+'''
+This file includes both (a) the backwards pass and (b) the backwards-over-backwards
+pass of attention written as "math" (in Jax). We include tests at the bottom: run
+this file via
+
+    python derivations.py
+
+to see them! 
+'''
+
+
 import jax
 import jax
 jax.config.update("jax_enable_x64", True)
