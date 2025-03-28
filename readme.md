@@ -103,7 +103,11 @@ In contrast, both the forward and backward passes of fused attention we can get 
 </p>
 
 ## Experiments
-Below, we measure walltime while varying sequence length (we fix batch size / dimension / number of heads; see the [experiment code](https://github.com/lengstrom/flashback/blob/main/tests/walltime.py#L92) for details. We measure for both sigmoid attention and softmax attention. In this setup our results are strong. Sigmoid attention dominates naive sigmoid attention in walltime, and softmax attention is at least as performant as its naive counterpart. At the same time, both methods (should) also use much less memory (we do not plot memory usage as it is tricky in Jax, but we expect fused attention to use ~linear memory in sequence length, while naive attention uses ~quadratic memory in sequence length). Together these results should make your model higher throughput. YMMV depending on your setting.
+Below, we measure walltime while varying sequence length (we fix batch size / dimension / number of heads; see the [experiment code](https://github.com/lengstrom/flashback/blob/main/tests/walltime.py#L92) for details. We measure for both sigmoid attention and softmax attention. In this setup our results are strong. Sigmoid attention dominates naive sigmoid attention in walltime, and softmax attention is at least as performant as its naive counterpart. At the same time, both methods (should) also use much less memory (we do not plot memory usage as it is tricky in Jax, but we expect fused attention to use ~linear memory in sequence length, while naive attention uses ~quadratic memory in sequence length). Together these results should make your model higher throughput. YMMV depending on your setting. In detail, the functions we test are:
+
+- **Forward**: just the forward pass
+- **Backward**: the forward pass then backward pass
+- **Backward-over-backward**: the forward pass then the backward pass, then the "backward" over this composition (i.e., in full, forward -> backward -> backward over backward -> backward)
 
 #### Sigmoid Attention
 <img src="plots/exp2_sigmoid.svg" width="100%"/>
