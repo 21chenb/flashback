@@ -1,4 +1,4 @@
-##  Flashback: A fused attention backwards-over-backwards ⚡🔙🔙
+##  Flashback: A flash attention backwards-over-backwards ⚡🔙🔙
 <p align = 'center'>
 [<a href="#quickstart">quickstart</a>]
 [<a href="#usage">usage</a>]
@@ -12,7 +12,7 @@
 
 </p>
 
-This Jax/[Pallas](https://docs.jax.dev/en/latest/pallas/index.html)/Triton project extends [fused attention](https://arxiv.org/abs/2205.14135) to support the backwards pass over the backwards pass (for e.g., <a href="https://arxiv.org/abs/2503.13751">differentiating over model training</a>). The main contributions are two-fold:
+This Jax/[Pallas](https://docs.jax.dev/en/latest/pallas/index.html)/Triton project extends [fused/"flash" attention](https://arxiv.org/abs/2205.14135) to support the backwards pass over the backwards pass (for e.g., <a href="https://arxiv.org/abs/2503.13751">differentiating over model training</a>). The main contributions are two-fold:
 
 - Fused backwards-over-backwards kernels for softmax (and sigmoid) attention operators
 - A rudimentary Pallas [autotuner](https://triton-lang.org/main/python-api/generated/triton.autotune.html)
