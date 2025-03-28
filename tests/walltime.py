@@ -96,7 +96,7 @@ def main():
         precisions = [Precision.TF32_ROUND]
         naives = [False, True]
         orders = [2, 1, 0]
-        sls = [64, 128, 256, 512, 1024, 2048, 4096]
+        sls = reversed([64, 128, 256, 512, 1024, 2048, 4096])
         prod = list(product(attn_types, precisions, naives, orders, sls))
 
         for attn_type, precision, naive, order, sl in tqdm(prod):
