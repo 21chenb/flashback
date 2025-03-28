@@ -21,7 +21,7 @@ Sigmoid attention double backwards is very fast; softmax attention double backwa
 ## What/Why?
 *What* is the "backwards-over-backwards" (over attention)? Recall that autograd is a two step procedure: (1) perform the operations comprising the function of interest, then (2) calculate the gradient by repeatedly the "backward pass" of each operation executed in the forward pass (via the chain rule). Any operation we want to differentiate over needs a backwards pass; as an example, see the compute graph for attention alongside the compute graph for its backwards pass:
 <img src="plots/fig/fig2.svg" width="100%"/>
-Therefore, if we want to perform autograd over a backwards pass, then we need a backwards pass for it: this is exactly the "backwards-over-backwards."
+Therefore, if we want to perform autograd over a backwards pass, then we need a backwards pass for the *backwards pass itself*: this is exactly the "backwards-over-backwards."
 
 *Why* implement a fused attention backwards-over-backwards? First, its a cool problem! But maybe more importantly, it enables calculating the gradient of any function that has a backwards pass over attention in it, such as model training steps. The gradient over model training steps arises in [metalearning](https://arxiv.org/abs/1703.03400), [optimizing over model training](https://arxiv.org/abs/2503.13751)/[hyperparameter search](https://arxiv.org/abs/1502.03492), [architecture search](https://arxiv.org/abs/1806.09055), [data poisoning](https://arxiv.org/abs/2204.09092) and more. By implementing a high throughput/memory efficient fused backwards-over-backwards for we hope to accelerate research in these areas for attention-based models (like transformers/LMs/VLMs).
 
@@ -83,7 +83,7 @@ It is easy to cut yourself with this project. Some things to watch out for:
 - **The autotuner failing**: The autotuner has a tqdm bar that runs, if it stops for an extended period of time look at the autotuner section below for possible remedies; please file an issue if you run into this.
 
 ## The Softmax Attention Calamity
-*Note: For more context on this section, read about the backwards pass of [flash attention](https://arxiv.org/abs/2205.14135).*
+*Note: For more context, read about the backwards pass of [flash attention](https://arxiv.org/abs/2205.14135).*
 
 Our <i>softmax</i> attention double backwards can have calamitous performance. Indeed, often does not greatly improve throughput in practical settings and can even match (or lose to) the naive implementation. This is due to both (a) <ins>the nature of the fused attention trick</ins> and (b) 
 <ins>the structure of the softmax attention computation</ins>.
