@@ -1,11 +1,11 @@
 ##  Flashback: Fused backwards-over-backwards for attention ⚡🔙🔙
 <p align = 'center'>
-[<a href="#quickstart">quickstart/install</a>]
+[<a href="#quickstart">quickstart</a>]
 [<a href="#overview">overview</a>]
 [<a href="#usage">usage</a>]
 [<a href="#sharp-pointsbest-practicesprecision-gotchas">pointy bits</a>]
 [<a href="#the-softmax-attention-calamity">the softmax attention calamity</a>]
-[<a href="#experiments">experiments/profiling</a>]
+[<a href="#experiments">experiments</a>]
   <br>
   by <a href="https://loganengstrom.com">Logan Engstrom</a> and <a href="https://feldmann.nyc">Axel Feldmann</a>
 
