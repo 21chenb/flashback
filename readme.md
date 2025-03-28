@@ -1,4 +1,4 @@
-##  Flashback: A Fused Attention backwards-over-backwards ⚡🔙🔙
+##  Flashback: A fused attention backwards-over-backwards ⚡🔙🔙
 <p align = 'center'>
 [<a href="#quickstart">quickstart</a>]
 [<a href="#overview">overview</a>]
