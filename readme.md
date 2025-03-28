@@ -1,4 +1,4 @@
-##  Flashback: A FlashAttention-style backwards-over-backwards ⚡🔙🔙
+##  Flashback: A FlashAttention backwards-over-backwards ⚡🔙🔙
 <p align = 'center'>
 [<a href="#whatwhy">why</a>]
 [<a href="#quickstart">quickstart</a>]
