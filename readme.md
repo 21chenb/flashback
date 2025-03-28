@@ -12,10 +12,10 @@
 
 </p>
 
-This Jax/Pallas/Triton project extends [fused attention](https://arxiv.org/abs/2205.14135) to support the backwards pass over the backwards pass (for e.g., <a href="https://arxiv.org/abs/2503.13751">differentiating over model training</a>). The main contributions are two-fold:
+This Jax/[Pallas](https://docs.jax.dev/en/latest/pallas/index.html)/Triton project extends [fused attention](https://arxiv.org/abs/2205.14135) to support the backwards pass over the backwards pass (for e.g., <a href="https://arxiv.org/abs/2503.13751">differentiating over model training</a>). The main contributions are two-fold:
 
 - Fused backwards-over-backwards kernels for softmax (and sigmoid) attention operators
-- A rudimentary [Pallas](https://docs.jax.dev/en/latest/pallas/index.html) autotuner
+- A rudimentary Pallas [autotuner](https://triton-lang.org/main/python-api/generated/triton.autotune.html)
 
 Sigmoid attention double backwards is very fast; softmax attention double backwards is not (yet) very fast. This is due to both (a) the structure of the computation and (b) the nature of the fused attention trick. In what follows, we include [derivations](https://github.com/lengstrom/flashback/blob/main/derivations.py) of the backwards-over-backward pass, and primers on why this (open) problem is hard - see the [The Softmax Attention Calamity](#the-softmax-attention-calamity) section below for details.
 
