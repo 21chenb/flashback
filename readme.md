@@ -1,15 +1,14 @@
 ##  Flashback: A FlashAttention-style backwards-over-backwards ⚡🔙🔙
 <p align = 'center'>
+[<a href="#whatwhy">why</a>]
 [<a href="#quickstart">quickstart</a>]
 [<a href="#usage">usage</a>]
 [<a href="#sharp-pointsbest-practicesprecision-gotchas">pointy bits</a>]
 [<a href="#the-softmax-attention-calamity">the softmax attention calamity</a>]
 [<a href="#experiments">experiments</a>]
   [<a href="#autotuner">autotuner</a>]
-
   <br>
   by <a href="https://loganengstrom.com">Logan Engstrom</a> and <a href="https://feldmann.nyc">Axel Feldmann</a>
-
 </p>
 
 This Jax/[Pallas](https://docs.jax.dev/en/latest/pallas/index.html)/Triton project extends [fused attention](https://arxiv.org/abs/2205.14135) to support the backwards pass over the backwards pass (for e.g., <a href="https://arxiv.org/abs/2503.13751">differentiating over model training</a>). The main contributions are two-fold:
@@ -19,7 +18,10 @@ This Jax/[Pallas](https://docs.jax.dev/en/latest/pallas/index.html)/Triton proje
 
 Sigmoid attention double backwards is very fast; softmax attention double backwards is not (yet) very fast. This is due to both (a) the structure of the computation and (b) the nature of the fused attention trick. In what follows, we include [derivations](https://github.com/lengstrom/flashback/blob/main/derivations.py) of the backwards-over-backward pass, and primers on why this (open) problem is hard - see the [The Softmax Attention Calamity](#the-softmax-attention-calamity) section below for details.
 
+## What/Why?
+*What* is the "backwards-over-backwards" (over attention)? Recall that autograd runs in two steps: (1) perform the operations comprising the function of interest, then (2) calculate the gradient by repeatedly applying the chain rule via the "backward pass" of each operation executed in the forward pass. Any operation we want to differentiate over needs a backwards pass. Therefore, if we want to perform autograd over a backwards pass, then we need a backwards pass for it: this is exactly the "backwards-over-backwards."
 
+*Why* implement a fused attention backwards-over-backwards? First, its a cool problem! But maybe more importantly, it enables calculating the gradient of any function that has a backwards pass over attention in it, such as model training steps. The gradient over model training arises in metalearning, [optimizing over model training](https://arxiv.org/abs/2503.13751)/[hyperparameter search](https://arxiv.org/abs/1502.03492), [architecture search](https://arxiv.org/abs/1806.09055), [data poisoning](https://arxiv.org/abs/2204.09092), ando more. By implementing a high throughput/memory efficient fused backwards-over-backwards for we hope to accelerate research in these areas for attention-based models (like transformers/LMs/VLMs).
 
 ## Quickstart
 
