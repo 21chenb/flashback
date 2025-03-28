@@ -71,7 +71,7 @@ O = sigmoid_mha(Q, K, V, sm_scale, bias, causal)
 ## Sharp Points/Best Practices/Precision gotchas
 It is easy to cut yourself with this project. Some things to watch out for:
 
-- **Precision**: If you use BF16 find yourself with bad double backwards gradients, try using TF32 precision (`Precision.TF32_ROUND`) or maybe FP16 precision (note that `Precision.FP16` is not tested as Jax does not support FP16 very well). These precision problems arise from the fact that double backwards has quite high computational depth.
+- **Precision**: If you use BF16 and find yourself with bad double backwards gradients, try using TF32 precision (`Precision.TF32_ROUND`) or maybe FP16 precision (note that `Precision.FP16` is not tested as Jax does not support FP16 very well). These precision problems arise from the fact that double backwards has quite high computational depth.
 - **Sigmoid attention**: This is really fast and works really well, you should use this if you can!
 - **Softmax double backwards in general**: I have not really been able to find a use for the softmax double backwards, in most practical cases it is roughly as fast as naive attention (even ~including memory gains..). See [open problems](#the-softmax-attention-calamity) section below.
 - **Large attention `d` compared to `T`**: If your per-head dimension is large relative to the sequence length fused attention methods will be slow (relative to naive computation) as they need to recompute the attention matrix many times (particularly in the backwards over backwards).
