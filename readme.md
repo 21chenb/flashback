@@ -1,4 +1,4 @@
-##  Flashback: A fused/"flash" attention backwards-over-backwards ⚡🔙🔙
+##  Flashback: A FlashAttention-style backwards-over-backwards ⚡🔙🔙
 <p align = 'center'>
 [<a href="#quickstart">quickstart</a>]
 [<a href="#usage">usage</a>]
