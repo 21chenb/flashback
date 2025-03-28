@@ -109,10 +109,10 @@ Below, we measure walltime while varying sequence length (we fix batch size / di
 - **Backward**: the forward pass then backward pass
 - **Backward-over-backward**: the forward pass then the backward pass, then the "backward" over this composition (i.e., in full, forward -> backward -> backward over backward -> backward)
 
-#### Sigmoid Attention
+### Sigmoid Attention
 <img src="plots/exp2_sigmoid.svg" width="100%"/>
 
-#### Softmax Attention
+### Softmax Attention
 <img src="plots/exp2_softmax.svg" width="100%"/>
 
 ## Autotuner
