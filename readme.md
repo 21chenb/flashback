@@ -6,6 +6,8 @@
 [<a href="#sharp-pointsbest-practicesprecision-gotchas">pointy bits</a>]
 [<a href="#the-softmax-attention-calamity">the softmax attention calamity</a>]
 [<a href="#experiments">experiments</a>]
+  [<a href="#autotuner">autotuner</a>]
+
   <br>
   by <a href="https://loganengstrom.com">Logan Engstrom</a> and <a href="https://feldmann.nyc">Axel Feldmann</a>
 
