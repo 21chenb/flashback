@@ -26,6 +26,20 @@ Sigmoid attention double backwards is very fast; softmax attention double backwa
 
 <b><i>Why</i> implement a fused attention backwards-over-backwards?</b> First, its a cool problem! But maybe more importantly, it enables calculating the gradient of any function that includes an attention backwards pass, such as model training steps. Indeed, functions like this arise in [metalearning](https://arxiv.org/abs/1703.03400), [optimizing over model training](https://arxiv.org/abs/2503.13751)/[hyperparameter search](https://arxiv.org/abs/1502.03492), [architecture search](https://arxiv.org/abs/1806.09055), [data poisoning](https://arxiv.org/abs/2204.09092) and more. By implementing a high throughput/memory efficient fused backwards-over-backwards for we hope to accelerate research in these areas for attention-based models (like transformers/LMs/VLMs).
 
+## Experiments
+Below, we measure walltime while varying sequence length (we fix batch size / dimension / number of heads; see the [experiment code](https://github.com/lengstrom/flashback/blob/main/tests/walltime.py#L92) for details. We measure for both sigmoid attention and softmax attention. In this setup our results are strong. Sigmoid attention dominates naive sigmoid attention in walltime, and softmax attention is at least as performant as its naive counterpart. At the same time, both methods (should) also use much less memory (we do not plot memory usage as it is tricky in Jax, but we expect fused attention to use ~linear memory in sequence length, while naive attention uses ~quadratic memory in sequence length). Together these results should make your model higher throughput. YMMV depending on your setting. In detail, the functions we test are:
+
+- **Forward**: just the forward pass
+- **Backward**: the forward pass then backward pass
+- **Backward-over-backward**: the forward pass then the backward pass, then the "backward" over this composition (i.e., in full, forward -> backward -> backward over backward -> backward)
+
+### Sigmoid Attention
+<img src="plots/exp2_sigmoid.svg" width="100%"/>
+
+### Softmax Attention
+<img src="plots/exp2_softmax.svg" width="100%"/>
+
+
 ## Quickstart
 
 Install with pip (`pip install git+https://github.com/lengstrom/flashback.git`). Example usage:
@@ -106,19 +120,6 @@ In contrast, both the forward and backward passes of fused attention we can get 
 
 <p><b>Sigmoid attention.</b> One light in the darkness here is sigmoid attention; sigmoid attention uses an elementwise activation (rather than "rowwise" over the input sequence as softmax attention is) so the double gradients are much faster/more straightforward. We can get away with only 4 reinstantiations total (rather than 5 in the double backwards case) and the operations are much simpler. This really shows up in the section below where we profile the different attentions.
 </p>
-
-## Experiments
-Below, we measure walltime while varying sequence length (we fix batch size / dimension / number of heads; see the [experiment code](https://github.com/lengstrom/flashback/blob/main/tests/walltime.py#L92) for details. We measure for both sigmoid attention and softmax attention. In this setup our results are strong. Sigmoid attention dominates naive sigmoid attention in walltime, and softmax attention is at least as performant as its naive counterpart. At the same time, both methods (should) also use much less memory (we do not plot memory usage as it is tricky in Jax, but we expect fused attention to use ~linear memory in sequence length, while naive attention uses ~quadratic memory in sequence length). Together these results should make your model higher throughput. YMMV depending on your setting. In detail, the functions we test are:
-
-- **Forward**: just the forward pass
-- **Backward**: the forward pass then backward pass
-- **Backward-over-backward**: the forward pass then the backward pass, then the "backward" over this composition (i.e., in full, forward -> backward -> backward over backward -> backward)
-
-### Sigmoid Attention
-<img src="plots/exp2_sigmoid.svg" width="100%"/>
-
-### Softmax Attention
-<img src="plots/exp2_softmax.svg" width="100%"/>
 
 ## Autotuner
 In Pytorch land, Triton has an autotuner that lets you input a menu of possible
