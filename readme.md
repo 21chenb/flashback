@@ -1,7 +1,6 @@
 ##  Flashback: A fused attention backwards-over-backwards ⚡🔙🔙
 <p align = 'center'>
 [<a href="#quickstart">quickstart</a>]
-[<a href="#overview">overview</a>]
 [<a href="#usage">usage</a>]
 [<a href="#sharp-pointsbest-practicesprecision-gotchas">pointy bits</a>]
 [<a href="#the-softmax-attention-calamity">the softmax attention calamity</a>]
