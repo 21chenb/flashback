@@ -9,7 +9,10 @@
     >=latex,                  % Use LaTeX arrow tips
     every edge/.style={->, thick, draw=black},  % Black arrows
     node distance=1.8cm,       % Vertical spacing between “below=...”
-    thick
+    thick,  show background rectangle,               % Tells TikZ to
+    % draw the background rectangle
+    background rectangle/.style={fill=white} % Sets the background
+    % rectangle fill color to white
   ]
 
   %--- Colored styles for Q, K, V, dO ---
