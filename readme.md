@@ -82,7 +82,7 @@ It is easy to cut yourself with this project. Some things to watch out for:
 *Note: For more context on this section, read about the backwards pass of [flash attention](https://arxiv.org/abs/2205.14135).*
 
 Our softmax double backwards often does not greatly improve throughput in practical settings and can even match (or lose to) the naive implementation. This is due to both (a) <ins>the nature of the fused attention trick</ins> and (b) 
-<ins>the structure of the computation</ins>.
+<ins>the structure of the softmax attention computation</ins>.
 
 <p><b>Pushing the limits of the fused attention trick.</b> With regard to (b), the fused attention trick <i>necessarily</i> requires reinstantiating the probability matrix on every pass. Thinking about the entire chain of compute when calculating the gradient with autograd: a pipeline that only completes the backward pass requires only two reinstantiations (once in the forward pass, once in backward). In contrast, any pipeline that includes the double backward pass requires at least 2 additional reinstantiations <i>on top of</i> those in the backwards pass (to see this, think about how we backprop on this compute graph: our forward pass here is "forward to backward", so we have to do one backwards over the backwards, then another backwards over the forward before finishing). In contrast,
 backprop over naive attention simply saves all the intermediate products so there is no additional recomputation cost. This is a pretty classic algorithmic tradeoff: storing vs. recomputing.
