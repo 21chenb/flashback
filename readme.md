@@ -27,16 +27,33 @@ Sigmoid attention double backwards is very fast; softmax attention double backwa
 <b><i>Why</i> implement a fused attention backwards-over-backwards?</b> First, its a cool problem! But maybe more importantly, it enables calculating the gradient of any function that includes an attention backwards pass, such as model training steps. Indeed, functions like this arise in [metalearning](https://arxiv.org/abs/1703.03400), [optimizing over model training](https://arxiv.org/abs/2503.13751)/[hyperparameter search](https://arxiv.org/abs/1502.03492), [architecture search](https://arxiv.org/abs/1806.09055), [data poisoning](https://arxiv.org/abs/2204.09092) and more. By implementing a high throughput/memory efficient fused backwards-over-backwards for we hope to accelerate research in these areas for attention-based models (like transformers/LMs/VLMs).
 
 ## Experiments
+
+### Memory benchmarks
+
+We find experimentally that:
+
+- using fused kernels allow <i>much</i> longer sequence lengths than using naive kernels, and
+- even on a fixed sequence length, fused kernels allow <i>much</i> larger batch sizes than naive kernels.
+
+Specifically, we measure the maximum (power of 2) batch size for different sequence lengths (we fix dimension / number of heads) for the backward-over-backward pass of a GPT-2 model using sigmoid attention. These gains are because fused attention uses ~linear memory in sequence length, while naive attention usese ~quadratic memory in sequence length. 
+
+<img src="plots/bs_benchmark.png" width="36%"/>
+
+### Throughput
+
+We measure for both sigmoid attention and softmax attention. In this setup sigmoid attention dominates naive sigmoid attention in walltime, and softmax attention is at least as performant as its naive counterpart. At the same time, both methods use much less memory (we expect fused attention to use ~linear memory in sequence length, while naive attention uses ~quadratic memory in sequence length). Together these results should make your model higher throughput. YMMV depending on your setting. In detail, the functions we test are:
+
+
 Below, we measure walltime while varying sequence length (we fix batch size / dimension / number of heads; see the [experiment code](https://github.com/lengstrom/flashback/blob/main/tests/walltime.py#L92) for details). We measure for both sigmoid attention and softmax attention. In this setup sigmoid attention dominates naive sigmoid attention in walltime, and softmax attention is at least as performant as its naive counterpart. At the same time, both methods use much less memory (we expect fused attention to use ~linear memory in sequence length, while naive attention uses ~quadratic memory in sequence length). Together these results should make your model higher throughput. YMMV depending on your setting. In detail, the functions we test are:
 
 - **Forward**: just the forward pass
 - **Backward**: the forward pass then backward pass
 - **Backward-over-backward**: the forward pass then the backward pass, then the "backward" over this composition (i.e., in full, forward -> backward -> backward over backward -> backward)
 
-### Sigmoid Attention
+#### Sigmoid Attention
 <img src="plots/exp2_sigmoid.svg" width="100%"/>
 
-### Softmax Attention
+#### Softmax Attention
 <img src="plots/exp2_softmax.svg" width="100%"/>
 
 
